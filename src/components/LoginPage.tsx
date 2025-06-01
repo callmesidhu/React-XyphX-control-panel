@@ -1,11 +1,8 @@
-
 import React, { useState } from 'react';
 import { Eye, EyeOff, User, Lock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
-
-
 
 const LoginPage = () => {
   const [username, setUsername] = useState('');
@@ -17,7 +14,6 @@ const LoginPage = () => {
     e.preventDefault();
     setIsLoading(true);
     
-  
     await new Promise(resolve => setTimeout(resolve, 1000));
     
 
@@ -33,7 +29,7 @@ const LoginPage = () => {
       <Card className="w-full max-w-md mx-4 glass-effect cyber-border animate-fade-in">
         <CardHeader className="text-center pb-8">
           <img src='/logo_dark.png' alt="XyphX Logo" className="mx-auto mb-4 w-32 h-32" />
-          <h1 className="text-3xl font-bold bg-gradient-to-r text-primary-500 bg-clip-text text-transparent">
+          <h1 className="text-3xl font-bold bg-gradient-to-r text-violet-600 bg-clip-text">
             XyphX Admin
           </h1>
           <p className="text-muted-foreground mt-2">Access your control panel</p>
