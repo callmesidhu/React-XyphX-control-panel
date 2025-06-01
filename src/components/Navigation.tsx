@@ -31,7 +31,7 @@ const Navigation: React.FC<NavigationProps> = ({
       <Button
         variant="ghost"
         size="icon"
-        className="md:hidden fixed top-4 left-4 z-50 bg-background/80 backdrop-blur-sm border border-primary/20"
+        className="md:hidden fixed top-4 right-4 z-50 bg-background/80 backdrop-blur-sm border border-primary/20"
         onClick={onToggle}
       >
         {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
