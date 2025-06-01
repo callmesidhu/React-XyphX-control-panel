@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Skeleton } from "@/components/ui/skeleton";
 
-import LoginPage from '@/components/LoginPage';
 import Dashboard from '@/components/Dashboard';
 import Portfolio from '@/components/Portfolio';
 import Navigation from '@/components/Navigation';

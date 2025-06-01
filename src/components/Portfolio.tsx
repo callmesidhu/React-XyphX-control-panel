@@ -1,11 +1,11 @@
 
 import React, { useState } from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import ServicesForm from './portfolio/ServicesForm';
-import ProductsForm from './portfolio/ProductsForm';
+import ProductsList from './portfolio/List';
+import ProductsForm from './portfolio/Form';
 
 const Portfolio: React.FC = () => {
-  const [activeTab, setActiveTab] = useState('services');
+  const [activeTab, setActiveTab] = useState('list');
 
   return (
     <div className="space-y-8 animate-fade-in">
@@ -13,30 +13,30 @@ const Portfolio: React.FC = () => {
         <h1 className="text-3xl font-bold bg-gradient-to-r from-primary-400 to-primary-600 bg-clip-text text-transparent">
           Portfolio Management
         </h1>
-        <p className="text-muted-foreground mt-2">Manage your services and products</p>
+        <p className="text-muted-foreground mt-2">Manage your products</p>
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-2 bg-background/50 border border-primary/20">
           <TabsTrigger 
-            value="services"
+            value="list"
             className="data-[state=active]:bg-primary data-[state=active]:text-white transition-all duration-300"
           >
-            Services
+            Show Products
           </TabsTrigger>
           <TabsTrigger 
-            value="products"
+            value="form"
             className="data-[state=active]:bg-primary data-[state=active]:text-white transition-all duration-300"
           >
-            Products
+            Add Product
           </TabsTrigger>
         </TabsList>
         
-        <TabsContent value="services" className="mt-8">
-          <ServicesForm />
+        <TabsContent value="list" className="mt-8">
+          <ProductsList />
         </TabsContent>
         
-        <TabsContent value="products" className="mt-8">
+        <TabsContent value="form" className="mt-8">
           <ProductsForm />
         </TabsContent>
       </Tabs>

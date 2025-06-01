@@ -6,31 +6,33 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Trash2, Edit } from 'lucide-react';
 
-interface Product {
+interface Service {
   id: string;
-  name: string;
+  title: string;
+  brief: string;
   description: string;
 }
 
-const ProductsForm: React.FC = () => {
-  const [products, setProducts] = useState<Product[]>([]);
+const ProductsList: React.FC = () => {
+  const [services, setServices] = useState<Service[]>([]);
   const [formData, setFormData] = useState({
-    name: '',
+    title: '',
+    brief: '',
     description: ''
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const newProduct: Product = {
+    const newService: Service = {
       id: Date.now().toString(),
       ...formData
     };
-    setProducts([...products, newProduct]);
-    setFormData({ name: '', description: '' });
+    setServices([...services, newService]);
+    setFormData({ title: '', brief: '', description: '' });
   };
 
-  const deleteProduct = (id: string) => {
-    setProducts(products.filter(product => product.id !== id));
+  const deleteService = (id: string) => {
+    setServices(services.filter(service => service.id !== id));
   };
 
   return (
@@ -38,18 +40,29 @@ const ProductsForm: React.FC = () => {
       <Card className="glass-effect cyber-border">
         <CardHeader>
           <CardTitle className="text-xl font-semibold bg-gradient-to-r from-primary-400 to-primary-600 bg-clip-text text-transparent">
-            Add New Product
+            Add New Service
           </CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground/80">Name</label>
+              <label className="text-sm font-medium text-foreground/80">Title</label>
               <Input
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                value={formData.title}
+                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                 className="bg-background/50 border-primary/20 focus:border-primary/50"
-                placeholder="Product name"
+                placeholder="Service title"
+                required
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground/80">Brief</label>
+              <Input
+                value={formData.brief}
+                onChange={(e) => setFormData({ ...formData, brief: e.target.value })}
+                className="bg-background/50 border-primary/20 focus:border-primary/50"
+                placeholder="Brief description"
                 required
               />
             </div>
@@ -60,7 +73,7 @@ const ProductsForm: React.FC = () => {
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 className="bg-background/50 border-primary/20 focus:border-primary/50 min-h-[120px]"
-                placeholder="Product description"
+                placeholder="Detailed description"
                 required
               />
             </div>
@@ -69,26 +82,26 @@ const ProductsForm: React.FC = () => {
               type="submit"
               className="w-full bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700"
             >
-              Add Product
+              Add Service
             </Button>
           </form>
         </CardContent>
       </Card>
 
-      {products.length > 0 && (
+      {services.length > 0 && (
         <div className="space-y-4">
-          <h3 className="text-xl font-semibold text-foreground">Products</h3>
+          <h3 className="text-xl font-semibold text-foreground">Services</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {products.map((product, index) => (
+            {services.map((service, index) => (
               <Card 
-                key={product.id} 
+                key={service.id} 
                 className="glass-effect cyber-border hover:border-primary/40 transition-all duration-300"
                 style={{ animationDelay: `${index * 100}ms` }}
               >
                 <CardContent className="p-6">
                   <div className="space-y-3">
                     <div className="flex items-start justify-between">
-                      <h4 className="font-semibold text-foreground">{product.name}</h4>
+                      <h4 className="font-semibold text-foreground">{service.title}</h4>
                       <div className="flex space-x-2">
                         <Button size="sm" variant="ghost" className="hover:bg-primary/10 hover:text-primary">
                           <Edit className="w-4 h-4" />
@@ -97,13 +110,14 @@ const ProductsForm: React.FC = () => {
                           size="sm" 
                           variant="ghost" 
                           className="hover:bg-red-500/10 hover:text-red-400"
-                          onClick={() => deleteProduct(product.id)}
+                          onClick={() => deleteService(service.id)}
                         >
                           <Trash2 className="w-4 h-4" />
                         </Button>
                       </div>
                     </div>
-                    <p className="text-sm text-muted-foreground">{product.description}</p>
+                    <p className="text-sm text-primary-400 font-medium">{service.brief}</p>
+                    <p className="text-sm text-muted-foreground">{service.description}</p>
                   </div>
                 </CardContent>
               </Card>
@@ -115,4 +129,4 @@ const ProductsForm: React.FC = () => {
   );
 };
 
-export default ProductsForm;
+export default ProductsList;

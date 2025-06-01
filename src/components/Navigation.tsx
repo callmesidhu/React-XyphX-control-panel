@@ -2,6 +2,9 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { LayoutDashboard, FolderOpen, LogOut, Menu, X } from 'lucide-react';
+import { signOut } from 'firebase/auth';
+import { Navigate, useNavigate } from 'react-router-dom';
+import { auth } from '../../configs/firebase';
 
 interface NavigationProps {
   currentPage: string;
@@ -21,9 +24,16 @@ const Navigation: React.FC<NavigationProps> = ({
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'portfolio', label: 'Portfolio', icon: FolderOpen },
-    { id: 'settings', label: 'Settings', icon: FolderOpen },
-    { id: 'users', label: 'Users', icon: FolderOpen },
   ];
+  const navigate = useNavigate();
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      navigate("/"); 
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  };
 
   return (
     <>
@@ -92,7 +102,7 @@ const Navigation: React.FC<NavigationProps> = ({
             <Button
               variant="ghost"
               className="w-full justify-start space-x-3 text-red-400 hover:bg-red-500/10 hover:text-red-300"
-              onClick={onLogout}
+              onClick={handleLogout}
             >
               <LogOut className="w-5 h-5" />
               <span>Sign Out</span>
