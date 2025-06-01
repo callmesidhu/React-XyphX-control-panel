@@ -1,130 +1,174 @@
+'use client';
 
-import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+import React, { useEffect, useState } from 'react';
+import { db } from '../../../configs/firebase';
+import {
+  collection,
+  getDocs,
+  deleteDoc,
+  doc,
+  updateDoc,
+  query,
+  orderBy
+} from 'firebase/firestore';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Trash2, Edit } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Trash2, Edit, Save, X } from 'lucide-react';
 
-interface Service {
+interface Product {
   id: string;
-  title: string;
-  brief: string;
+  name: string;
   description: string;
+  status: string;
+  link: string;
+  rank: number;
 }
 
 const ProductsList: React.FC = () => {
-  const [services, setServices] = useState<Service[]>([]);
-  const [formData, setFormData] = useState({
-    title: '',
-    brief: '',
-    description: ''
+  const [products, setProducts] = useState<Product[]>([]);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editData, setEditData] = useState<Omit<Product, 'id'>>({
+    name: '',
+    description: '',
+    status: '',
+    link: '',
+    rank: 0
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const newService: Service = {
-      id: Date.now().toString(),
-      ...formData
-    };
-    setServices([...services, newService]);
-    setFormData({ title: '', brief: '', description: '' });
+  const fetchProducts = async () => {
+    const q = query(collection(db, 'products'), orderBy('rank'));
+    const snapshot = await getDocs(q);
+    const data = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data()
+    })) as Product[];
+    setProducts(data);
   };
 
-  const deleteService = (id: string) => {
-    setServices(services.filter(service => service.id !== id));
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  const deleteProduct = async (id: string) => {
+    await deleteDoc(doc(db, 'products', id));
+    setProducts(products.filter((product) => product.id !== id));
+  };
+
+  const startEditing = (product: Product) => {
+    setEditingId(product.id);
+    setEditData({
+      name: product.name,
+      description: product.description,
+      status: product.status,
+      link: product.link,
+      rank: product.rank
+    });
+  };
+
+  const cancelEdit = () => {
+    setEditingId(null);
+  };
+
+  const saveEdit = async (id: string) => {
+    const productRef = doc(db, 'products', id);
+    await updateDoc(productRef, {
+      ...editData,
+      rank: Number(editData.rank)
+    });
+
+    setProducts((prev) =>
+      prev.map((p) => (p.id === id ? { id, ...editData } : p))
+    );
+    setEditingId(null);
   };
 
   return (
-    <div className="space-y-8">
-      <Card className="glass-effect cyber-border">
+    <div className="space-y-6">
+      <Card>
         <CardHeader>
-          <CardTitle className="text-xl font-semibold bg-gradient-to-r from-primary-400 to-primary-600 bg-clip-text text-transparent">
-            Add New Service
-          </CardTitle>
+          <CardTitle className="text-xl">Products List (Edit & Delete)</CardTitle>
         </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground/80">Title</label>
-              <Input
-                value={formData.title}
-                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                className="bg-background/50 border-primary/20 focus:border-primary/50"
-                placeholder="Service title"
-                required
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground/80">Brief</label>
-              <Input
-                value={formData.brief}
-                onChange={(e) => setFormData({ ...formData, brief: e.target.value })}
-                className="bg-background/50 border-primary/20 focus:border-primary/50"
-                placeholder="Brief description"
-                required
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground/80">Description</label>
-              <Textarea
-                value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                className="bg-background/50 border-primary/20 focus:border-primary/50 min-h-[120px]"
-                placeholder="Detailed description"
-                required
-              />
-            </div>
-            
-            <Button
-              type="submit"
-              className="w-full bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700"
-            >
-              Add Service
-            </Button>
-          </form>
+        <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {products.length > 0 ? (
+            products.map((product) =>
+              editingId === product.id ? (
+                <Card key={product.id} className="p-4 border shadow ">
+                  <input
+                    className="w-full mb-2 rounded border p-2 text-white bg-gray-800"
+                    value={editData.name}
+                    onChange={(e) => setEditData({ ...editData, name: e.target.value })}
+                  />
+                  <input
+                    className="w-full mb-2 rounded border p-2 text-white bg-gray-800"
+                    value={editData.description}
+                    onChange={(e) => setEditData({ ...editData, description: e.target.value })}
+                  />
+                  <input
+                    className="w-full mb-2 rounded border p-2 text-white bg-gray-800"
+                    value={editData.status}
+                    onChange={(e) => setEditData({ ...editData, status: e.target.value })}
+                  />
+                  <input
+                    className="w-full mb-2 rounded border p-2 text-white bg-gray-800"
+                    value={editData.link}
+                    onChange={(e) => setEditData({ ...editData, link: e.target.value })}
+                  />
+                  <input
+                    className="w-full mb-4 rounded border p-2 text-white bg-gray-800"
+                    type="number"
+                    value={editData.rank}
+                    onChange={(e) => setEditData({ ...editData, rank: Number(e.target.value) })}
+                  />
+                  <div className="flex justify-end gap-2">
+                    <Button size="sm" onClick={() => saveEdit(product.id)} className="bg-green-600 text-white">
+                      <Save className="w-4 h-4 mr-1" /> Save
+                    </Button>
+                    <Button size="sm" variant="ghost" onClick={cancelEdit}>
+                      <X className="w-4 h-4 mr-1" /> Cancel
+                    </Button>
+                  </div>
+                </Card>
+              ) : (
+                <Card key={product.id} className="p-4 border shadow">
+                  <div className="flex justify-between items-start mb-2">
+                    <h3 className="font-semibold text-lg">{product.name}</h3>
+                    <div className="flex gap-2">
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => startEditing(product)}
+                      >
+                        <Edit className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="text-red-500"
+                        onClick={() => deleteProduct(product.id)}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </div>
+                  <p className="text-sm text-muted-foreground">{product.description}</p>
+                  <p className="text-xs">Status: {product.status}</p>
+                  <a
+                    href={product.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs text-blue-600 underline"
+                  >
+                    Visit Product
+                  </a>
+                  <p className="text-xs text-muted-foreground">Rank: {product.rank}</p>
+                </Card>
+              )
+            )
+          ) : (
+            <p className="text-muted-foreground col-span-full">No products found.</p>
+          )}
         </CardContent>
       </Card>
-
-      {services.length > 0 && (
-        <div className="space-y-4">
-          <h3 className="text-xl font-semibold text-foreground">Services</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {services.map((service, index) => (
-              <Card 
-                key={service.id} 
-                className="glass-effect cyber-border hover:border-primary/40 transition-all duration-300"
-                style={{ animationDelay: `${index * 100}ms` }}
-              >
-                <CardContent className="p-6">
-                  <div className="space-y-3">
-                    <div className="flex items-start justify-between">
-                      <h4 className="font-semibold text-foreground">{service.title}</h4>
-                      <div className="flex space-x-2">
-                        <Button size="sm" variant="ghost" className="hover:bg-primary/10 hover:text-primary">
-                          <Edit className="w-4 h-4" />
-                        </Button>
-                        <Button 
-                          size="sm" 
-                          variant="ghost" 
-                          className="hover:bg-red-500/10 hover:text-red-400"
-                          onClick={() => deleteService(service.id)}
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    </div>
-                    <p className="text-sm text-primary-400 font-medium">{service.brief}</p>
-                    <p className="text-sm text-muted-foreground">{service.description}</p>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   );
 };
