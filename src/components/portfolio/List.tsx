@@ -22,6 +22,7 @@ interface Product {
   status: string;
   link: string;
   rank: number;
+  logo?: string;
 }
 
 const ProductsList: React.FC = () => {
@@ -32,7 +33,8 @@ const ProductsList: React.FC = () => {
     description: '',
     status: '',
     link: '',
-    rank: 0
+    rank: 0,
+    logo: ''
   });
 
   const fetchProducts = async () => {
@@ -61,7 +63,8 @@ const ProductsList: React.FC = () => {
       description: product.description,
       status: product.status,
       link: product.link,
-      rank: product.rank
+      rank: product.rank,
+      logo: product.logo || ''
     });
   };
 
@@ -92,35 +95,46 @@ const ProductsList: React.FC = () => {
           {products.length > 0 ? (
             products.map((product) =>
               editingId === product.id ? (
-                <Card key={product.id} className="p-4 border shadow ">
+                <Card key={product.id} className="p-4 border shadow">
                   <input
                     className="w-full mb-2 rounded border p-2 text-white bg-gray-800"
                     value={editData.name}
                     onChange={(e) => setEditData({ ...editData, name: e.target.value })}
+                    placeholder="Product name"
                   />
                   <input
                     className="w-full mb-2 rounded border p-2 text-white bg-gray-800"
                     value={editData.description}
                     onChange={(e) => setEditData({ ...editData, description: e.target.value })}
+                    placeholder="Description"
                   />
                   <input
                     className="w-full mb-2 rounded border p-2 text-white bg-gray-800"
                     value={editData.status}
                     onChange={(e) => setEditData({ ...editData, status: e.target.value })}
+                    placeholder="Status"
                   />
                   <input
                     className="w-full mb-2 rounded border p-2 text-white bg-gray-800"
                     value={editData.link}
                     onChange={(e) => setEditData({ ...editData, link: e.target.value })}
+                    placeholder="Product link"
+                  />
+                  <input
+                    className="w-full mb-2 rounded border p-2 text-white bg-gray-800"
+                    value={editData.logo}
+                    onChange={(e) => setEditData({ ...editData, logo: e.target.value })}
+                    placeholder="Logo URL (optional)"
                   />
                   <input
                     className="w-full mb-4 rounded border p-2 text-white bg-gray-800"
                     type="number"
                     value={editData.rank}
                     onChange={(e) => setEditData({ ...editData, rank: Number(e.target.value) })}
+                    placeholder="Rank"
                   />
                   <div className="flex justify-end gap-2">
-                    <Button size="sm" onClick={() => saveEdit(product.id)} className="bg-green-600 text-white">
+                    <Button size="sm" onClick={() => saveEdit(product.id)} className="bg-violet-700 text-white">
                       <Save className="w-4 h-4 mr-1" /> Save
                     </Button>
                     <Button size="sm" variant="ghost" onClick={cancelEdit}>
@@ -133,11 +147,7 @@ const ProductsList: React.FC = () => {
                   <div className="flex justify-between items-start mb-2">
                     <h3 className="font-semibold text-lg">{product.name}</h3>
                     <div className="flex gap-2">
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => startEditing(product)}
-                      >
+                      <Button size="sm" variant="ghost" onClick={() => startEditing(product)}>
                         <Edit className="w-4 h-4" />
                       </Button>
                       <Button
@@ -150,13 +160,20 @@ const ProductsList: React.FC = () => {
                       </Button>
                     </div>
                   </div>
+                  {product.logo && (
+                    <img
+                      src={product.logo}
+                      alt={`${product.name} logo`}
+                      className="w-20 h-20 object-contain mb-2"
+                    />
+                  )}
                   <p className="text-sm text-muted-foreground">{product.description}</p>
                   <p className="text-xs">Status: {product.status}</p>
                   <a
                     href={product.link}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-xs text-blue-600 underline"
+                    className="text-xs text-purple-600 underline"
                   >
                     Visit Product
                   </a>
@@ -165,7 +182,7 @@ const ProductsList: React.FC = () => {
               )
             )
           ) : (
-            <p className="text-muted-foreground col-span-full">No products found.</p>
+            <p className="text-muted-foreground col-span-full">Loading...</p>
           )}
         </CardContent>
       </Card>
