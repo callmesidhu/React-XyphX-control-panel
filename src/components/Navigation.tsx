@@ -5,6 +5,7 @@ import { LayoutDashboard, FolderOpen, LogOut, Menu, X } from 'lucide-react';
 import { signOut } from 'firebase/auth';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { auth } from '../../configs/firebase';
+import { useAuth } from '@/services/AuthContext';
 
 interface NavigationProps {
   currentPage: string;
@@ -17,7 +18,6 @@ interface NavigationProps {
 const Navigation: React.FC<NavigationProps> = ({ 
   currentPage, 
   onPageChange, 
-  onLogout,
   isOpen,
   onToggle
 }) => {
@@ -26,9 +26,10 @@ const Navigation: React.FC<NavigationProps> = ({
     { id: 'portfolio', label: 'Portfolio', icon: FolderOpen },
   ];
   const navigate = useNavigate();
+  const { logout } = useAuth();
   const handleLogout = async () => {
     try {
-      await signOut(auth);
+      await logout();
       navigate("/"); 
     } catch (error) {
       console.error("Logout failed:", error);
